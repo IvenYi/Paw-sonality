@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 彻底修复：本地字体强制注入 */
+
+/* 1. 阿里妈妈方圆体 */
+@font-face {
+  font-family: 'Alimama';
+  src: url('/fonts/Alimama.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 2. 沐瑶软笔体 */
+@font-face {
+  font-family: 'Muyao';
+  src: url('/fonts/Muyao.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 3. 思源柔黑体 */
+@font-face {
+  font-family: 'GenJyuu';
+  src: url('/fonts/GenJyuu.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 4. Fredoka */
+@font-face {
+  font-family: 'Fredoka';
+  src: url('/fonts/Fredoka.ttf') format('truetype');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 直接在 CSS 中定义这些 Tailwind 类名，避免映射失效 */
+@layer utilities {
+  .font-alimama {
+    font-family: 'Alimama', 'Fredoka', 'PingFang SC', sans-serif !important;
+  }
+  .font-muyao {
+    font-family: 'Muyao', 'cursive' !important;
+  }
+  .font-genjyuu {
+    font-family: 'GenJyuu', 'PingFang SC', sans-serif !important;
+  }
+  .font-fredoka {
+    font-family: 'Fredoka', sans-serif !important;
+  }
+}
+
+@layer base {
+  body {
+    -webkit-tap-highlight-color: transparent;
+    font-family: 'GenJyuu', 'PingFang SC', 'Microsoft YaHei UI', sans-serif;
+    @apply bg-background text-chocolate;
+  }
+}
+
+.bubbly-card {
+  @apply bg-white rounded-4xl shadow-soft border-2 border-transparent transition-all duration-300;
+}
+
+.bubbly-card:hover {
+  @apply shadow-xl -translate-y-1;
+}
+
+.primary-button {
+  @apply bg-primary text-white font-bold py-4 px-8 rounded-2xl shadow-lg active:scale-95 transition-transform;
+}
