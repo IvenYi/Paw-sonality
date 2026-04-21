@@ -7,18 +7,28 @@ import ResultPage from './pages/ResultPage'
 export type Page = 'home' | 'quiz' | 'result'
 export type PetType = 'dog' | 'cat'
 
+export interface Scores {
+  E: number; I: number;
+  S: number; N: number;
+  T: number; F: number;
+  J: number; P: number;
+  A: number; T_: number; // 第5维度：Assertive vs Turbulent
+}
+
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home')
   const [petType, setPetType] = useState<PetType>('dog')
   const [mbtiResult, setMbtiResult] = useState('ENFP')
+  const [scores, setScores] = useState<Scores>({ E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0, A: 0, T_: 0 })
 
   const startQuiz = (type: PetType) => {
     setPetType(type)
     setCurrentPage('quiz')
   }
 
-  const showResult = (result: string) => {
+  const showResult = (result: string, scores: Scores) => {
     setMbtiResult(result)
+    setScores(scores)
     setCurrentPage('result')
   }
 
@@ -42,7 +52,7 @@ function App() {
             <QuizPage key="quiz" petType={petType} onComplete={showResult} />
           )}
           {currentPage === 'result' && (
-            <ResultPage key="result" result={mbtiResult} petType={petType} onReset={reset} />
+            <ResultPage key="result" result={mbtiResult} scores={scores} petType={petType} onReset={reset} />
           )}
         </AnimatePresence>
       </div>

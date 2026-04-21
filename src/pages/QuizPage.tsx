@@ -4,15 +4,16 @@ import { X, Bone, Fish, Footprints } from 'lucide-react'
 
 interface QuizPageProps {
   petType: 'dog' | 'cat'
-  onComplete: (result: string) => void
+  onComplete: (result: string, scores: Scores) => void
 }
 
 // MBTI 计分接口
-interface Scores {
+export interface Scores {
   E: number; I: number;
   S: number; N: number;
   T: number; F: number;
   J: number; P: number;
+  A: number; T_: number;
 }
 
 // 题库类型定义
@@ -284,6 +285,22 @@ const QuizPage = ({ petType, onComplete }: QuizPageProps) => {
   const totalSteps = questions.length;
   const currentQuestion = questions[step];
 
+  const skipToResult = () => {
+    const randomScores: Scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+    questions.forEach(q => {
+      const randomOption = q.options[Math.floor(Math.random() * q.options.length)];
+      randomScores[randomOption.dimension] += randomOption.weight;
+    });
+    
+    const E_or_I = randomScores.E > randomScores.I ? 'E' : 'I';
+    const S_or_N = randomScores.S > randomScores.N ? 'S' : 'N';
+    const T_or_F = randomScores.T > randomScores.F ? 'T' : 'F';
+    const J_or_P = randomScores.J > randomScores.P ? 'J' : 'P';
+    const finalMBTI = `${E_or_I}${S_or_N}${T_or_F}${J_or_P}`;
+    
+    onComplete(finalMBTI, randomScores);
+  };
+
   const handleOptionClick = (dimension: keyof Scores, weight: number) => {
     const newScores = { ...scores, [dimension]: scores[dimension] + weight };
     setScores(newScores);
@@ -298,15 +315,14 @@ const QuizPage = ({ petType, onComplete }: QuizPageProps) => {
         const J_or_P = newScores.J > newScores.P ? 'J' : 'P';
         const finalMBTI = `${E_or_I}${S_or_N}${T_or_F}${J_or_P}`;
         
-        onComplete(finalMBTI);
+        onComplete(finalMBTI, newScores);
       }
-    }, 400); // 稍微增加延迟，让用户感受到优雅的点击反馈
+    }, 400); 
   };
 
   const themeColor = petType === 'dog' ? 'bg-accent-yellow/30' : 'bg-accent-pink/30'
   const progressBg = petType === 'dog' ? 'bg-accent-yellow/40' : 'bg-accent-pink/40'
   const activeHoverColor = petType === 'dog' ? 'hover:bg-accent-yellow/10 hover:border-accent-yellow' : 'hover:bg-accent-pink/10 hover:border-accent-pink'
-  const activeTapColor = petType === 'dog' ? 'bg-accent-yellow/20' : 'bg-accent-pink/20'
 
   return (
     <motion.div
@@ -316,7 +332,6 @@ const QuizPage = ({ petType, onComplete }: QuizPageProps) => {
       className="flex-1 flex flex-col w-full min-h-screen items-center font-genjyuu relative overflow-hidden"
     >
       <div className="w-full max-w-2xl px-6 flex flex-col flex-1 pb-12 z-10 relative">
-        {/* 顶部导航 */}
         <header className="flex items-center justify-between mb-10 pt-10">
           <motion.div 
             initial={{ x: -20, opacity: 0 }}
@@ -328,15 +343,22 @@ const QuizPage = ({ petType, onComplete }: QuizPageProps) => {
               第 {step + 1} 题 <span className="text-primary/40 font-fredoka mx-1">/</span> 共 {totalSteps} 题
             </h2>
           </motion.div>
-          <button 
-            onClick={() => window.location.reload()}
-            className="text-chocolate/30 hover:text-primary hover:bg-white/80 backdrop-blur-sm p-3 rounded-full transition-all shadow-sm border border-transparent hover:border-primary/10"
-          >
-            <X size={24} strokeWidth={2.5} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={skipToResult}
+              className="px-4 py-2 bg-white/60 backdrop-blur-md text-primary/60 hover:text-primary rounded-full text-sm font-alimama border border-primary/5 hover:border-primary/20 transition-all shadow-sm"
+            >
+              跳过调试
+            </button>
+            <button 
+              onClick={() => window.location.reload()}
+              className="text-chocolate/30 hover:text-primary hover:bg-white/80 backdrop-blur-sm p-3 rounded-full transition-all shadow-sm border border-transparent hover:border-primary/10"
+            >
+              <X size={24} strokeWidth={2.5} />
+            </button>
+          </div>
         </header>
 
-        {/* 更Q弹的胖胖进度条 */}
         <div className={`w-full h-4 ${progressBg} rounded-full mb-12 overflow-hidden shadow-inner relative`}>
           <motion.div
             initial={{ width: 0 }}
@@ -344,12 +366,10 @@ const QuizPage = ({ petType, onComplete }: QuizPageProps) => {
             transition={{ type: "spring", stiffness: 80, damping: 15 }}
             className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary to-[#FF8E6E] rounded-full"
           >
-            {/* 进度条末端的高光点 */}
             <div className="absolute right-1 top-[2px] w-2 h-2 bg-white/50 rounded-full blur-[1px]" />
           </motion.div>
         </div>
 
-        {/* 答题卡片区域 */}
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
@@ -360,11 +380,7 @@ const QuizPage = ({ petType, onComplete }: QuizPageProps) => {
             className="flex-1 flex flex-col"
           >
             <div className="bg-white/80 backdrop-blur-xl border border-white/50 p-8 md:p-12 rounded-[2.5rem] shadow-[0_20px_50px_rgba(74,44,42,0.05)] mb-8 flex-1 flex flex-col relative overflow-hidden">
-              
-              {/* 卡片内部的微弱装饰光晕 */}
               <div className={`absolute -top-20 -right-20 w-40 h-40 ${themeColor} blur-3xl rounded-full pointer-events-none`} />
-
-              {/* 增加题目的留白和呼吸感 */}
               <div className="mb-6 md:mb-10 relative z-10 flex gap-4 items-start">
                 {petType === 'dog' ? (
                   <motion.div animate={{ rotate: [-10, 10, -10] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="shrink-0 mt-1 md:mt-0">
@@ -380,10 +396,8 @@ const QuizPage = ({ petType, onComplete }: QuizPageProps) => {
                 </h3>
               </div>
 
-              {/* 选项区域：增强对比度，缩短与标题的距离 */}
               <div className="w-full flex flex-col gap-4 md:gap-5 mt-4 md:mt-6 relative z-10 max-w-[340px] md:max-w-[480px] mx-auto">
                 {currentQuestion.options.map((option, index) => {
-                  // 将选项文案拆分为 [标签] 和 [描述]
                   const match = option.text.match(/^【(.*?)】(.*)$/);
                   const label = match ? match[1] : '';
                   const desc = match ? match[2] : option.text;
