@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { RotateCcw, Heart, Quote, Share2, Sparkles, User, Trophy, RefreshCw, HelpCircle, Trash2, Footprints, ChevronLeft, ChevronRight, Star, Bookmark } from 'lucide-react'
+import { RotateCcw, Heart, Quote, Share2, Sparkles, User, Trophy, RefreshCw, HelpCircle, Trash2, Footprints, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import html2canvas from 'html2canvas'
 import { Scores } from '../App'
@@ -7,6 +7,7 @@ import RadarChart from '../components/RadarChart'
 import { dogDeepQuestions, catDeepQuestions } from './QuizPage'
 import { dogResults, catResults } from '../data/mbtiResults'
 import { SOUL_RESILIENCE_CONTENT, getRelationshipLabel, getDeepSyncAnalysis, getLetterToOwner } from '../data/analysisContent'
+import { verifyRedemptionCode, updateFinalResult } from '../api/verification'
 
 type ResultStage = 'BASIC' | 'SELECT_OWNER' | 'DEEP_QUIZ' | 'FINAL'
 
@@ -21,7 +22,7 @@ const mbtiTypes = ['ENFP', 'ENTP', 'INFP', 'INTP', 'ENFJ', 'ENTJ', 'INFJ', 'INTJ
 
 const ResultPage = ({ result, scores: propScores, petType, onReset }: ResultPageProps) => {
   const [stage, setStage] = useState<ResultStage>('BASIC')
-  const [isUnlocked, setIsUnlocked] = useState(false)
+  const [, setIsUnlocked] = useState(false)
   const [isGenerating, setIsGenerating] = useState(false)
   const [unlockCode, setUnlockCode] = useState('')
   const [isVerifying, setIsVerifying] = useState(false)
@@ -40,7 +41,7 @@ const ResultPage = ({ result, scores: propScores, petType, onReset }: ResultPage
     if (saved) {
       try {
         const data = JSON.parse(saved)
-        if (data && data.code === '8888') {
+        if (data && data.code) { // 只要有 code 就认为是解锁过
           setIsUnlocked(true)
           if (data.isFinished && data.finalScores) {
             setStage('FINAL'); setOwnerMBTI(data.ownerMBTI || 'ENFP'); setFinalScores(data.finalScores)
@@ -53,11 +54,17 @@ const ResultPage = ({ result, scores: propScores, petType, onReset }: ResultPage
   const handleVerify = async () => {
     if (!unlockCode) return
     setIsVerifying(true)
-    await new Promise(r => setTimeout(r, 800))
-    if (unlockCode === '8888') {
+    
+    // 真实调用 Supabase API 校验，并录入 4 轴分析数据
+    const res = await verifyRedemptionCode(unlockCode, petType, result)
+    
+    if (res.success) {
       localStorage.setItem('paws_unlocked_session', JSON.stringify({ code: unlockCode, isFinished: false }))
-      setIsUnlocked(true); setStage('SELECT_OWNER')
-    } else { alert('魔法口令不对哦 ~') }
+      setIsUnlocked(true)
+      setStage('SELECT_OWNER')
+    } else {
+      alert(res.message) // '口令无效' 或 '已在其他设备使用' 等
+    }
     setIsVerifying(false)
   }
 
@@ -68,13 +75,20 @@ const ResultPage = ({ result, scores: propScores, petType, onReset }: ResultPage
     setDeepAnswers(newAnswers);
     const newScores = { ...deepScores, [key]: (deepScores as any)[key] + weight }
     setDeepScores(newScores)
-    setTimeout(() => {
+    setTimeout(async () => {
       if (deepQuizStep + 1 < deepQuestions.length) {
         setDeepQuizStep(deepQuizStep + 1)
       } else {
         const final = { ...propScores, ...newScores }
         setFinalScores(final); setStage('FINAL')
-        localStorage.setItem('paws_unlocked_session', JSON.stringify({ code: '8888', isFinished: true, ownerMBTI, finalScores: final }))
+        
+        // 动态获取存储里的 code，避免硬编码 8888
+        const saved = localStorage.getItem('paws_unlocked_session')
+        const currentCode = saved ? JSON.parse(saved).code : unlockCode
+        localStorage.setItem('paws_unlocked_session', JSON.stringify({ code: currentCode, isFinished: true, ownerMBTI, finalScores: final }))
+
+        const currentMBTI5 = `${result}-${final.T_ > final.A ? 'T' : 'A'}`
+        await updateFinalResult(currentCode, currentMBTI5, ownerMBTI)
       }
     }, 400)
   }

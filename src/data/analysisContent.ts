@@ -1,5 +1,3 @@
-import { Scores } from '../App';
-
 // 灵魂韧性 (-A vs -T) 的深度解析
 export const SOUL_RESILIENCE_CONTENT = {
   'A': {

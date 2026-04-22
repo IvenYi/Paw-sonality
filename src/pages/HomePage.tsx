@@ -1,6 +1,6 @@
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion'
 import { Dog, Cat, PawPrint, Quote, Sparkles } from 'lucide-react'
-import { useState, MouseEvent } from 'react'
+import { MouseEvent } from 'react'
 
 interface HomePageProps {
   onStart: (type: 'dog' | 'cat') => void
