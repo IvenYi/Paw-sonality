@@ -1,41 +1,33 @@
-# Paw-sonality 开发状态快照 (2026-04-21 - MVP 商业化版)
+# Paw-sonality 开发状态快照 (2026-04-21 - 架构重构版)
 
-> **项目目标**：打造一款面向小红书受众的治愈系宠物 MBTI 测试，实现“免费测试获取基础结果 -> 付费解锁深度报告”的商业闭环。
-> **当前状态**：MVP 商业闭环（测试、海报、付费核销、数据大盘）已 **100% 跑通且稳定**。准备切入 `Refactoring` 分支进行组件级架构重构。
-
----
-
-## 1. 核心功能已实现 (Done)
-- **视觉体验 (Vibe)**：完美还原 Bubbly UI (多邻国风)，大量运用 `framer-motion` 实现页面无缝转场、果冻回弹和 Q 弹交互。
-- **动态雷达图 (Radar)**：基于 SVG 原生计算，支持从 4 轴（基础版）到 5 轴（PRO版）的丝滑物理形变动效，解决 html2canvas 兼容性。
-- **商业化漏斗 (Funnel)**：
-  - 极简付费卡片（免跳转，原位展示）。
-  - 深度题库（由行为学专家视角拆解的 4 道 -T/-A 情境题，猫狗独立）。
-  - 灵魂契合度报告（引入主人 MBTI 选择器与交叉匹配算法）。
-- **核销系统 (Serverless Backend)**：
-  - 基于 Supabase PostgreSQL。
-  - 前端集成 FingerprintJS 采集设备指纹，防止口令被多设备“白嫖”。
-  - 支持 `localStorage` 缓存状态，页面刷新或隔天访问不掉线。
-- **管理中枢 (Admin Dashboard)**：
-  - 内置路由 `/admin`，受账号密码保护。
-  - **转化概览**：核心指标展示（总发行、已核销、今日新增）。
-  - **引流大盘**：自动抓取用户做题结果，生成猫狗占比及 TOP 5 爆款宠格排名。
-  - **客服中心**：支持 6 位/8 位口令的精确搜索、批次筛选、日期区间筛选与分页浏览。支持一键解绑设备和作废。
-  - **发卡中心**：一键批量生成 8 位大小写混合防混淆口令。
+> **项目目标**：打造一款面向小红书受众的治愈系宠物 MBTI 测试，实现“免费测试获取基础结果 -> 付费解锁深度报告 -> 数据驱动引流”的商业闭环。
+> **当前状态**：`Refactoring` 分支已完成。全量代码已完成组件化拆分，各模块职责明确，健壮性显著提升。
 
 ---
 
-## 2. 项目设计哲学与记忆锚点 (Design Philosophy)
-- **前端重视觉，后端极轻量**：坚持前端单体工程（Monorepo），后端完全依赖 Supabase Serverless 和 REST API，将运维成本降至最低。
-- **“永远不说不合适”**：在生成主人与宠物的契合度报告时，所有的 MBTI 差异都被解读为“正向情绪互补”或“宿命般的遇见”，以提供极致的情绪价值。
-- **“社交货币”为王**：海报生成是第一优先级。海报必须摒弃冗余的引号和渐变兼容 bug，以最高清的 Scale: 3 比例和专属底纹导出。
+## 1. 核心架构重构 (Architecture Highlights)
+- **上帝组件拆解**：
+  - `AdminPage.tsx`：拆分为 Layout 外壳 + 4个独立 Tab 组件（Dashboard, Insights, Service, Generate）。
+  - `ResultPage.tsx`：拆分为 Layout 外壳 + 5个核心业务组件（Paywall, OwnerSelector, DeepQuizFlow, FinalReport, SharePoster）。
+  - `HomePage.tsx`：拆分为 HeroSection, EntranceCards 和 SocialProof。
+- **数据与逻辑剥离**：
+  - 题库中心：`src/data/questions.ts` 集中管理 32 道测试题。
+  - 算法中枢：`src/utils/mbtiLogic.ts` 封装 MBTI 计分与结果生成逻辑。
+- **通用 UI 组件库**：
+  - 新建 `src/components/ui/`，沉淀了 `SpotlightCard` 和 `AmbientLight` 等高性能动画组件。
 
 ---
 
-## 3. 下一步行动纲领：架构重构 (The Refactoring Branch)
-由于快速迭代，核心页面（如 `ResultPage.tsx` 和 `AdminPage.tsx`）代码量已逼近 500 行，触碰了维护和 AI 自动修改的红线。
-我们即将在 `Refactoring` 分支执行以下操作：
-1.  **拆解 AdminPage**：将 Dashboard 转化为 Layout 外壳，将 4 个 Tab（转化、引流、客服、发卡）抽离为独立的组件文件。
-2.  **拆解 ResultPage**：将支付墙卡片、深度题交互流、最终报告卡片抽离，使其成为一个纯粹的状态机调度器。
+## 2. 商业化闭环成果 (Commercial Readiness)
+- **多维核销系统**：完美接入 Supabase，支持 8 位安全口令校验、设备指纹绑定、LocalStorage 持久化。
+- **引流数据中心**：管理后台具备实时转化看板、猫狗占比统计及 TOP 5 爆款宠格大盘，为小红书文案提供数据支撑。
+- **高级分享海报**：支持 4 轴/5 轴动态切换，Scale 3 超清导出，针对移动端社交分享深度优化。
 
-*(如果你在新会话中看到此文件，请直接要求 AI 读取 `REFACTORING_PLAN.md` 启动重构。)*
+---
+
+## 3. Git 分支管理
+- `main`：存放功能完整的稳定版（MVP版）。
+- `Refactoring`：存放当前已完成架构重构的进阶版（代码最整洁）。
+
+---
+*本文件记录了项目从功能实现到架构艺术的进化过程。*
