@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Bone, Fish, Footprints, ChevronLeft } from 'lucide-react'
 import { Scores } from '../App'
 import { dogQuestions, catQuestions, dogDeepQuestions, catDeepQuestions } from '../data/questions'
-import { calculateMBTIResult, generateRandomScores } from '../utils/mbtiLogic'
+import { calculateMBTIResult } from '../utils/mbtiLogic'
 
 interface QuizPageProps {
   petType: 'dog' | 'cat'
@@ -23,12 +23,6 @@ const QuizPage = ({ petType, onComplete, isDeep = false }: QuizPageProps) => {
     
   const totalSteps = questions.length;
   const currentQuestion = questions[step];
-
-  // 调试功能：跳过测试
-  const skipToResult = () => {
-    const randomScores = generateRandomScores(questions);
-    finalizeResult(randomScores);
-  };
 
   const finalizeResult = (finalScores: Scores) => {
     const resultString = calculateMBTIResult(finalScores, isDeep);
@@ -90,7 +84,6 @@ const QuizPage = ({ petType, onComplete, isDeep = false }: QuizPageProps) => {
             </motion.div>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={skipToResult} className="px-4 py-2 bg-white/60 backdrop-blur-md text-primary/60 hover:text-primary rounded-full text-sm font-alimama border border-primary/5 hover:border-primary/20 transition-all shadow-sm">跳过调试</button>
             <button onClick={() => window.location.reload()} className="text-chocolate/30 hover:text-primary hover:bg-white/80 backdrop-blur-sm p-3 rounded-full transition-all shadow-sm border border-transparent hover:border-primary/10"><X size={24} strokeWidth={2.5} /></button>
           </div>
         </header>

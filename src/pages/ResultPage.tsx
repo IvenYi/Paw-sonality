@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { RotateCcw, Heart, Quote, Share2, Trash2 } from 'lucide-react'
+import { RotateCcw, Heart, Quote, Share2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import html2canvas from 'html2canvas'
 import { Scores } from '../App'
@@ -190,7 +190,6 @@ const ResultPage = ({ result, scores: propScores, petType, onReset }: ResultPage
         <div className="flex flex-col items-center gap-6 w-full mt-6">
           <motion.button onClick={downloadPoster} disabled={isGenerating} whileHover={{ y: -2 }} whileTap={{ scale: 0.95 }} className={`flex items-center gap-2.5 px-6 py-3 transition-all duration-300 group relative ${themeAccent}`}><Share2 size={20} strokeWidth={2.2} className="group-hover:rotate-12 transition-transform duration-300" /><span className="font-alimama text-xl tracking-widest font-medium relative">{isGenerating ? '正在生成...' : '分享'}<span className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-[1.5px] transition-all group-hover:w-full opacity-40 ${themeBg}`} /></span></motion.button>
           <button onClick={onReset} className="flex items-center gap-2 text-chocolate/20 hover:text-chocolate/40 transition-colors text-sm font-genjyuu"><RotateCcw size={14} /><span>换个崽重测</span></button>
-          <button onClick={() => { localStorage.removeItem('paws_unlocked_session'); window.location.reload() }} className="mt-8 px-4 py-1.5 border border-dashed border-chocolate/10 text-chocolate/10 hover:text-red-400 hover:border-red-400/30 rounded-lg text-xs font-genjyuu transition-all flex items-center gap-2 tracking-widest"><Trash2 size={12} /> 清除设备指纹 (仅调试可见)</button>
         </div>
       </div>
     </motion.div>

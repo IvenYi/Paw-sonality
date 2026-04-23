@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion'
-import { Sparkles, Heart, Footprints, HelpCircle } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Sparkles, Heart, Footprints, HelpCircle, Copy, CheckCircle2 } from 'lucide-react'
+import { useState } from 'react'
 
 interface PaywallCardProps {
   unlockCode: string
@@ -10,6 +11,19 @@ interface PaywallCardProps {
 }
 
 export const PaywallCard = ({ unlockCode, setUnlockCode, handleVerify, isVerifying, themeBg }: PaywallCardProps) => {
+  const [showTip, setShowTip] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText('Paw-sonality');
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('复制失败', err);
+    }
+  };
+
   return (
     <motion.div 
       key="pay" 
@@ -55,9 +69,57 @@ export const PaywallCard = ({ unlockCode, setUnlockCode, handleVerify, isVerifyi
         </button>
       </div>
       
-      <button className="mt-4 flex items-center justify-center gap-1.5 text-chocolate/30 text-sm mx-auto hover:text-primary transition-colors font-genjyuu">
+      <button 
+        onClick={() => setShowTip(!showTip)} 
+        className="mt-4 flex items-center justify-center gap-1.5 text-chocolate/30 text-sm mx-auto hover:text-primary transition-colors font-genjyuu"
+      >
         <HelpCircle size={14} /> 如何获取口令？
       </button>
+
+      <AnimatePresence>
+        {showTip && (
+          <motion.div
+            initial={{ opacity: 0, height: 0, marginTop: 0 }}
+            animate={{ opacity: 1, height: 'auto', marginTop: 16 }}
+            exit={{ opacity: 0, height: 0, marginTop: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="bg-primary/5 rounded-2xl p-4 md:p-5 text-left border border-primary/10 flex flex-col gap-4">
+              {/* 方式一：店铺转化 */}
+              <div>
+                <h4 className="text-primary font-bold text-sm mb-1.5 flex items-center gap-1.5">
+                  <span className="bg-primary/10 px-1.5 py-0.5 rounded text-[10px] tracking-wider">方式一</span> 
+                  ⚡️ 快速获取口令
+                </h4>
+                <p className="text-chocolate/70 text-xs font-genjyuu leading-relaxed">
+                  前往小红书关注 <strong className="text-primary font-bold">@Paw-sonality</strong>，进入主页<strong className="text-primary font-bold">店铺</strong>即可直接带走【魔法口令】，支持一下深夜秃头的主理人吧 🥺
+                </p>
+              </div>
+
+              <div className="h-px w-full border-t border-dashed border-primary/15"></div>
+
+              {/* 方式二：裂变传播 */}
+              <div>
+                <h4 className="text-primary font-bold text-sm mb-1.5 flex items-center gap-1.5">
+                  <span className="bg-primary/10 px-1.5 py-0.5 rounded text-[10px] tracking-wider">方式二</span> 
+                  🎁 动动发财小手
+                </h4>
+                <p className="text-chocolate/70 text-xs font-genjyuu leading-relaxed">
+                  分享海报，在小红书发布测试结果并 <strong className="text-primary font-bold">@Paw-sonality</strong>。带上笔记截图私信，客服人工掉落免费口令！✨
+                </p>
+              </div>
+
+              <button 
+                onClick={copyToClipboard}
+                className="mt-1 flex items-center justify-center w-full gap-1.5 text-xs md:text-sm font-bold font-genjyuu text-primary bg-white/80 hover:bg-white transition-colors px-4 py-2.5 rounded-xl shadow-sm border border-primary/10 active:scale-[0.98]"
+              >
+                {copied ? <CheckCircle2 size={16} /> : <Copy size={16} />}
+                {copied ? '已复制账号，快去打开小红书吧' : '一键复制小红书账号'}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }
