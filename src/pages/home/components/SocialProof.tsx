@@ -12,7 +12,7 @@ export const SocialProof = () => {
       <Quote size={24} className="text-primary/20 rotate-180" />
       <p className="text-chocolate/50 text-base md:text-xl font-medium italic font-genjyuu leading-relaxed px-4 relative">
         <span className="absolute -left-2 -top-2 text-4xl text-primary/10 font-serif">"</span>
-        原来我家 dog 是 <span className="text-primary/70 font-bold font-fredoka text-xl bg-accent-yellow/30 px-2 rounded-md">ENFP</span>！怪不得每天像个快乐的傻瓜，治愈死我了～
+        原来我家 dog 是 <span className="text-primary/70 font-bold font-fredoka text-xl bg-accent-yellow/30 px-2 rounded-md">ENFP</span>怪不得每天像个快乐的傻瓜～
         <span className="absolute -right-2 -bottom-4 text-4xl text-primary/10 font-serif">"</span>
       </p>
       <div className="flex items-center gap-3 mt-4">

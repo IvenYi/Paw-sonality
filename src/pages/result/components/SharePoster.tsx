@@ -119,7 +119,7 @@ export const SharePoster = ({
             <p className="text-[2.2rem] text-chocolate/20 font-bold font-fredoka tracking-[0.3em] uppercase leading-tight">But we listen.</p>
           </div>
           <div className="flex flex-col gap-1 mt-2">
-            <p className="text-[1.8rem] text-primary/40 font-fredoka font-bold tracking-[0.15em] uppercase whitespace-nowrap">WWW.PAWSONALITY.PRO</p>
+            <p className="text-[1.8rem] text-primary/40 font-fredoka font-bold tracking-[0.15em] uppercase whitespace-nowrap">Pawti.fun</p>
             <p className="text-[1.4rem] font-alimama text-chocolate/25 tracking-[0.2em] leading-none font-normal whitespace-nowrap">扫描即刻解锁它的宇宙</p>
           </div>
         </div>
